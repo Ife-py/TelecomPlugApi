@@ -12,10 +12,10 @@ Route::get('/hello', function () {
     return response()->json(['message' => 'Hello from API!']);
 });
 
-Route::prefix('products')->group(function () {
-    Route::get('/', [ProductController::class, 'index']);
-    Route::post('/', [ProductController::class, 'store']);
-    Route::get('/{id}', [ProductController::class, 'show']);
-    Route::put('/{id}', [ProductController::class, 'update']);
-    Route::delete('/{id}', [ProductController::class, 'destroy']);
+Route::controller(ProductController::class)->prefix('products')->group(function () {
+    Route::get('/','index');
+    Route::post('/','store');
+    Route::get('/{id}','show');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
 });
