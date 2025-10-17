@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Http\Controllers;
-
 /**
  * @OA\Info(
  *     title="Telecom API Documentation",
@@ -16,10 +14,17 @@ namespace App\Http\Controllers;
  *         url="https://opensource.org/licenses/MIT"
  *     )
  * )
+ *
  * @OA\Server(
- *     url=L5_SWAGGER_CONST_HOST,
+ *     url="http://127.0.0.1:8000",
  *     description="Local Development Server"
  * )
+ *
+ * @OA\Server(
+ *     url="https://your-production-domain.com",
+ *     description="Production Server"
+ * )
+ *
  * @OA\SecurityScheme(
  *     securityScheme="sanctum",
  *     type="http",
@@ -28,7 +33,3 @@ namespace App\Http\Controllers;
  *     description="Enter token in format (Bearer <token>)"
  * )
  */
-abstract class Controller
-{
-    //
-}
