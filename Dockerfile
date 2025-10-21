@@ -8,12 +8,12 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libpq-dev \                   # PostgreSQL library
-    default-mysql-client \        # MySQL client
+    libpq-dev \
+    mysql-client \
     zip \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql pgsql  # ✅ install both MySQL + Postgres
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql pgsql
 
 # Enable Apache mod_rewrite (required for Laravel routing)
 RUN a2enmod rewrite
