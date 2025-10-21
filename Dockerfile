@@ -22,8 +22,9 @@ RUN a2enmod rewrite
 # Copy project files
 COPY . /var/www/html
 
-# Set working directory
-WORKDIR /var/www/html
+# Set working directory to Laravel's public folder
+WORKDIR /var/www/html/public
+
 
 # Install Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
