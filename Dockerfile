@@ -8,38 +8,32 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libpq-dev \                   # PostgreSQL library
+    default-mysql-client \        # MySQL client
     zip \
     unzip \
-    libpq-dev \ 
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql pgsql 
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql pgsql  # ✅ install both MySQL + Postgres
 
-# Enable Apache mod_rewrite
+# Enable Apache mod_rewrite (required for Laravel routing)
 RUN a2enmod rewrite
+
+# Copy project files
+COPY . /var/www/html
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all Laravel files into the container
-COPY . /var/www/html
-
 # Install Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
-
-# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set proper permissions for Laravel
+# Set permissions for storage and bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# ✅ Configure Apache to serve from Laravel's /public directory
-RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/apache2.conf
-
-# Expose port 80
+# Expose port 80 for Apache
 EXPOSE 80
 
 # Start Apache
