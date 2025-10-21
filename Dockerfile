@@ -2,7 +2,6 @@
 FROM php:8.2-apache
 
 # Install system dependencies and PHP extensions
-# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -14,28 +13,34 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql pgsql
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql pgsql bcmath mbstring
 
-# Enable Apache mod_rewrite (required for Laravel routing)
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Copy project files
-COPY . /var/www/html
+# Set Apache root to Laravel public folder
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Set working directory to Laravel's public folder
-WORKDIR /var/www/html/public
-
-
-# Install Composer
+# Copy composer from official image
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
+
+# Install composer dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions for storage and bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Copy rest of the application
+COPY . .
 
-# Expose port 80 for Apache
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage
+
+# Expose port
 EXPOSE 80
 
 # Start Apache
