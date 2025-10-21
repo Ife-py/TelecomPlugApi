@@ -1,7 +1,6 @@
 # Use official PHP image with Apache
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libpq-dev \
-    default-mysql-client \
+    mariadb-client \
     zip \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
