@@ -3,9 +3,12 @@
 # Build vendor in a PHP CLI stage so we can install required PHP extensions
 FROM php:8.2-cli AS vendor-stage
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    apt-utils \
     git unzip zip curl ca-certificates \
-    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" gd intl pdo_mysql pdo_pgsql zip bcmath mbstring \
     && rm -rf /var/lib/apt/lists/*
@@ -14,8 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /app
-COPY composer.json composer.lock ./
-# --no-scripts can help if scripts require runtime services; remove if you need scripts to run
+COPY composer.json composer.lock ./ 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Final runtime image
