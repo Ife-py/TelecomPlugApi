@@ -1,22 +1,34 @@
-FROM composer:2 AS vendor-stage
+# syntax=docker/dockerfile:1
+
+# Build vendor in a PHP CLI stage so we can install required PHP extensions
+FROM php:8.2-cli AS vendor-stage
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git unzip zip curl ca-certificates \
+    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" gd intl pdo_mysql pdo_pgsql zip bcmath mbstring \
+    && rm -rf /var/lib/apt/lists/*
+
+# copy composer binary from official composer image
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /app
 COPY composer.json composer.lock ./
+# --no-scripts can help if scripts require runtime services; remove if you need scripts to run
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
+# Final runtime image
 FROM php:8.2-apache
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-# Install system deps (including libicu for ext-intl)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git unzip zip curl ca-certificates \
     libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" gd pdo_mysql pdo_pgsql pgsql intl bcmath mbstring zip \
     && rm -rf /var/lib/apt/lists/*
 
-# enable rewrite and set document root
 RUN a2enmod rewrite
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
