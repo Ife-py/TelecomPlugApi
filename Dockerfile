@@ -19,7 +19,7 @@ RUN apt-get update -o Acquire::Retries=3 \
 # install libraries needed for PHP extensions (use libjpeg62-turbo-dev)
 RUN apt-get update -o Acquire::Retries=3 \
  && apt-get install -y --no-install-recommends \
-     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev libwebp-dev libonig-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev libwebp-dev libonig-dev default-libmysqlclient-dev \
  && rm -rf /var/lib/apt/lists/*
 
 # configure and install PHP extensions (split to make failures easier to read)
@@ -53,7 +53,7 @@ RUN apt-get update -o Acquire::Retries=3 \
 
 RUN apt-get update -o Acquire::Retries=3 \
  && apt-get install -y --no-install-recommends \
-     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev libwebp-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev libwebp-dev default-libmysqlclient-dev \
  && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
