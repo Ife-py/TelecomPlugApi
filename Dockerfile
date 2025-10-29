@@ -13,13 +13,13 @@ WORKDIR /tmp-build
 
 # update and install minimal prerequisites first (with retries)
 RUN apt-get update -o Acquire::Retries=3 \
- && apt-get install -y --no-install-recommends apt-utils git unzip zip curl ca-certificates \
+ && apt-get install -y --no-install-recommends apt-utils git unzip zip curl ca-certificates build-essential pkg-config \
  && rm -rf /var/lib/apt/lists/*
 
 # install libraries needed for PHP extensions (use libjpeg62-turbo-dev)
 RUN apt-get update -o Acquire::Retries=3 \
  && apt-get install -y --no-install-recommends \
-    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev \
+     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev zlib1g-dev libwebp-dev \
  && rm -rf /var/lib/apt/lists/*
 
 # configure and install PHP extensions
@@ -44,12 +44,12 @@ ENV TZ=UTC
 
 # install minimal runtime libs
 RUN apt-get update -o Acquire::Retries=3 \
- && apt-get install -y --no-install-recommends ca-certificates \
+ && apt-get install -y --no-install-recommends ca-certificates build-essential pkg-config \
  && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update -o Acquire::Retries=3 \
  && apt-get install -y --no-install-recommends \
-     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev \
+     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev libwebp-dev \
  && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
