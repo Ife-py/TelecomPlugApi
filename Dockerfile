@@ -97,7 +97,44 @@ RUN set -eux; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 
 RUN set -eux; \
-    docker-php-ext-install -j"$(nproc)" gd pdo_mysql pdo_pgsql pgsql intl bcmath mbstring zip
+    echo "==> runtime: installing gd"; \
+    docker-php-ext-install -j"$(nproc)" gd; \
+    echo "==> runtime: gd installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing pdo_mysql"; \
+    docker-php-ext-install -j"$(nproc)" pdo_mysql; \
+    echo "==> runtime: pdo_mysql installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing pdo_pgsql"; \
+    docker-php-ext-install -j"$(nproc)" pdo_pgsql; \
+    echo "==> runtime: pdo_pgsql installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing pgsql"; \
+    docker-php-ext-install -j"$(nproc)" pgsql; \
+    echo "==> runtime: pgsql installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing intl"; \
+    docker-php-ext-install -j"$(nproc)" intl; \
+    echo "==> runtime: intl installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing zip"; \
+    docker-php-ext-install -j"$(nproc)" zip; \
+    echo "==> runtime: zip installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing bcmath"; \
+    docker-php-ext-install -j"$(nproc)" bcmath; \
+    echo "==> runtime: bcmath installed";
+
+RUN set -eux; \
+    echo "==> runtime: installing mbstring"; \
+    docker-php-ext-install -j"$(nproc)" mbstring; \
+    echo "==> runtime: mbstring installed";
 
 RUN rm -rf /var/lib/apt/lists/*
 
