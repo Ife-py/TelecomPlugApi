@@ -56,9 +56,13 @@ RUN apt-get update -o Acquire::Retries=3 \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev libwebp-dev default-libmysqlclient-dev \
  && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j"$(nproc)" gd pdo_mysql pdo_pgsql pgsql intl bcmath mbstring zip \
- && rm -rf /var/lib/apt/lists/*
+RUN set -eux; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
+
+RUN set -eux; \
+    docker-php-ext-install -j"$(nproc)" gd pdo_mysql pdo_pgsql pgsql intl bcmath mbstring zip
+
+RUN rm -rf /var/lib/apt/lists/*
 
 RUN a2enmod rewrite
 
