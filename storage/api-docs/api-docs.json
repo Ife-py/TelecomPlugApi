@@ -115,6 +115,9 @@
                                 "required": [
                                     "name",
                                     "email",
+                                    "username",
+                                    "phoneNumber",
+                                    "pin",
                                     "password",
                                     "password_confirmation"
                                 ],
@@ -127,6 +130,19 @@
                                         "type": "string",
                                         "format": "email",
                                         "example": "john.doe@example.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "phoneNumber": {
+                                        "type": "string",
+                                        "example": "+2348012345678"
+                                    },
+                                    "pin": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "1234"
                                     },
                                     "password": {
                                         "type": "string",

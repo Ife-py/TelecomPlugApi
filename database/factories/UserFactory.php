@@ -23,11 +23,18 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $pin = str_pad((string) fake()->numberBetween(0, 9999), 4, '0', STR_PAD_LEFT);
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            // keep a stable default password across factory instances
             'password' => static::$password ??= Hash::make('password'),
+            'username' => fake()->unique()->userName(),
+            'phoneNumber' => fake()->unique()->phoneNumber(),
+            // store hashed pin
+            'pin' => Hash::make($pin),
             'remember_token' => Str::random(10),
         ];
     }
