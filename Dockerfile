@@ -90,7 +90,7 @@ RUN apt-get update -o Acquire::Retries=3 \
 
 RUN apt-get update -o Acquire::Retries=3 \
  && apt-get install -y --no-install-recommends \
-    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev libwebp-dev default-libmysqlclient-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev libwebp-dev default-libmysqlclient-dev libonig-dev \
  && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
