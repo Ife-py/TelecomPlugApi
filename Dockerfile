@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 
 # Build vendor in a PHP CLI stage so we can install required PHP extensions
+# syntax=docker/dockerfile:1
+
+# Build vendor in a PHP CLI stage so we can install required PHP extensions
 FROM php:8.2-cli AS vendor-stage
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -30,8 +33,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 WORKDIR /app
 COPY composer.json composer.lock ./
 
-# run composer in this PHP stage (extensions already present)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
 
 # Final runtime image
 FROM php:8.2-apache
@@ -47,7 +49,7 @@ RUN apt-get update -o Acquire::Retries=3 \
 
 RUN apt-get update -o Acquire::Retries=3 \
  && apt-get install -y --no-install-recommends \
-    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev \
+     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libpq-dev libicu-dev \
  && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -83,9 +85,14 @@ COPY --from=vendor-stage /app/composer.json ./composer.json
 # copy app
 COPY . .
 
+# copy entrypoint into the image and make executable
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

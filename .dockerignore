@@ -1,0 +1,16 @@
+vendor
+node_modules
+.git
+.env
+storage/logs
+storage/*.key
+.env.local
+.DS_Store
+npm-debug.log
+yarn-error.log
+.idea
+.vscode
+coverage
+**/.git
+**/vendor
+**/node_modules
