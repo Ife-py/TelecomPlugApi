@@ -74,7 +74,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 WORKDIR /app
 COPY composer.json composer.lock ./
 
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+RUN composer install --no-interaction --prefer-dist --no-progress
 
 # Final runtime image
 FROM php:8.2-apache
