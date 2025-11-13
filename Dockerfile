@@ -34,6 +34,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 775 storage bootstrap/cache
 
+# ✅ Generate Swagger docs before the container runs
+RUN php artisan l5-swagger:generate
+    
 EXPOSE 80
 
 # ✅ Final startup sequence (runs when container starts, not during build)
