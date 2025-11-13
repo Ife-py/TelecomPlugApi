@@ -12,33 +12,37 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Enable mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
-# Set document root to public/
+# Set document root to Laravel "public" folder
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -i "s|/var/www/html|${APACHE_DOCUMENT_ROOT}|g" /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
 
-# Copy composer binary
+# Copy Composer from official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# ✅ Copy the full Laravel app BEFORE running composer
+# Copy all app files
 COPY . .
 
-# Copy example .env to avoid artisan errors
+# Copy .env.example as fallback
 RUN cp .env.example .env || true
 
-# Install PHP dependencies (disable scripts so artisan won't run during build)
-RUN composer install --no-interaction --prefer-dist --no-progress --no-scripts
+# Install Composer dependencies (no artisan scripts during build)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
-# Ensure storage & cache directories are writable
+# Ensure writable permissions for Laravel storage/cache
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 775 storage bootstrap/cache
 
 EXPOSE 80
 
-# ✅ Run artisan commands at container start
-CMD php artisan key:generate --force && \
-    php artisan config:clear && \
-    php artisan cache:clear && \
-    php artisan package:discover --ansi && \
+# ✅ Final startup sequence (runs when container starts, not during build)
+CMD set -e; \
+    echo "Running Laravel setup..."; \
+    php artisan key:generate --force || true; \
+    php artisan config:clear || true; \
+    php artisan cache:clear || true; \
+    php artisan migrate --force || true; \
+    php artisan package:discover --ansi || true; \
+    echo "Starting Apache..."; \
     apache2-foreground
