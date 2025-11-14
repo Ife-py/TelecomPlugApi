@@ -34,11 +34,12 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 775 storage bootstrap/cache
 
-# Publish L5 Swagger assets
-RUN php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider" --force
+# Publish Swagger UI assets (CSS, JS, icons)
+RUN php artisan vendor:publish --tag=l5-swagger-assets --force
 
-# ✅ Generate Swagger docs before the container runs
-RUN php artisan l5-swagger:generate
+# Generate Swagger JSON documentation
+RUN php artisan l5-swagger:generate --force || true
+
 
 EXPOSE 80
 
