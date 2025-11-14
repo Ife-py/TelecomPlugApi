@@ -22,14 +22,25 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
-# FIX: allow Laravel to write logs/cache on Render
-RUN mkdir -p storage/logs \
-    && chmod -R 777 storage bootstrap/cache
+# Ensure correct permissions for Laravel
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
+# Publish Swagger assets to public/vendor/l5-swagger
+RUN php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider" --force || true
+
+# Generate Swagger docs
+RUN php artisan l5-swagger:generate || true
 
 EXPOSE 80
 
-CMD set -e; \
-    php artisan key:generate --force || true; \
-    php artisan migrate --force || true; \
-    php artisan config:clear || true; \
-    apache2-foreground
+CMD php artisan key:generate --force \
+    && php artisan optimize:clear \
+    && php artisan config:clear \
+    && php artisan cache:clear \
+    && php artisan view:clear \
+    && php artisan migrate --force \
+    && chown -R www-data:www-data storage \
+    && chmod -R 775 storage \
+    && apache2-foreground
