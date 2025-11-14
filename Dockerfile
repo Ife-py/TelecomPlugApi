@@ -30,16 +30,21 @@ RUN cp .env.example .env || true
 # Install Composer dependencies (no artisan scripts during build)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
-# Ensure writable permissions for Laravel storage/cache
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 775 storage bootstrap/cache
-
-# Publish Swagger UI assets (CSS, JS, icons)
+# -----------------------------------------------------
+# 🔥 IMPORTANT: Publish Swagger UI assets
+# -----------------------------------------------------
 RUN php artisan vendor:publish --tag=l5-swagger-assets --force
 
-# Generate Swagger JSON documentation
+# -----------------------------------------------------
+# 🔥 IMPORTANT: Generate Swagger documentation
+# -----------------------------------------------------
 RUN php artisan l5-swagger:generate --force || true
 
+# -----------------------------------------------------
+# 🔥 FIX ALL PERMISSION ISSUES (Swagger + Logs + Cache)
+# -----------------------------------------------------
+RUN chown -R www-data:www-data storage bootstrap/cache public/vendor \
+    && chmod -R 775 storage bootstrap/cache public/vendor
 
 EXPOSE 80
 
