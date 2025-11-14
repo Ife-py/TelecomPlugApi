@@ -35,6 +35,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 # -----------------------------------------------------
 RUN php artisan vendor:publish --tag=l5-swagger-assets --force
 
+# Ensure vendor folder exists
+RUN mkdir -p public/vendor
 # -----------------------------------------------------
 # 🔥 IMPORTANT: Generate Swagger documentation
 # -----------------------------------------------------
