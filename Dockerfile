@@ -17,22 +17,19 @@ WORKDIR /var/www/html
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy full project (including public/vendor/l5-swagger committed in Git)
+# Copy full project (INCLUDING swagger assets)
 COPY . .
 
-# Install dependencies without running artisan scripts
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
-# Fix permissions for Laravel only
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+# FIX: allow Laravel to write logs/cache on Render
+RUN mkdir -p storage/logs \
+    && chmod -R 777 storage bootstrap/cache
 
 EXPOSE 80
 
 CMD set -e; \
     php artisan key:generate --force || true; \
-    php artisan config:clear || true; \
-    php artisan cache:clear || true; \
     php artisan migrate --force || true; \
-    php artisan package:discover --ansi || true; \
+    php artisan config:clear || true; \
     apache2-foreground
