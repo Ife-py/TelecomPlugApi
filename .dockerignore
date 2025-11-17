@@ -14,3 +14,7 @@ coverage
 **/.git
 **/vendor
 **/node_modules
+
+# Keep public/vendor in the build (contains published swagger-ui assets)
+!public/vendor
+!public/vendor/**
