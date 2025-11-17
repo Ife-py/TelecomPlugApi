@@ -1,4 +1,13 @@
 <?php
+// Normalize swagger UI assets path: if a problematic env value points to a vendor path
+// (for example: "vendor/l5-swagger" or "vendor/swagger-api/swagger-ui/dist/")
+// prefer the published public path so the UI can load when assets are published
+$envSwaggerAssets = env('L5_SWAGGER_UI_ASSETS_PATH');
+if ($envSwaggerAssets && preg_match('#^vendor\/(l5-swagger|swagger-api)#i', $envSwaggerAssets)) {
+    $resolvedSwaggerUiAssets = 'public/vendor/l5-swagger/';
+} else {
+    $resolvedSwaggerUiAssets = $envSwaggerAssets ?: 'public/vendor/l5-swagger/';
+}
 
 return [
     'default' => 'default',
@@ -24,8 +33,8 @@ return [
                 * Edit to set path where swagger ui assets should be stored
                 */
                 // Default to the published assets in public/vendor so the UI can load
-                // If the environment variable is empty, fall back to the published public/vendor path
-                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH') ?: 'public/vendor/l5-swagger/',
+                // Path where swagger UI assets should be stored (resolved at runtime)
+                'swagger_ui_assets_path' => $resolvedSwaggerUiAssets,
 
                 /*
                  * File name of the generated json documentation file
