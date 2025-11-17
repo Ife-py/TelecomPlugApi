@@ -27,7 +27,10 @@ return [
                 /*
                  * Edit to include full URL in ui for assets
                  */
-                'use_absolute_path' => env('L5_SWAGGER_USE_ABSOLUTE_PATH', true),
+                // By default prefer relative paths to avoid mixed-content issues behind TLS
+                // terminators (e.g., Render or other proxies). Set the env var to true if
+                // you need absolute URLs and APP_URL/TrustProxies are configured.
+                'use_absolute_path' => env('L5_SWAGGER_USE_ABSOLUTE_PATH', false),
 
                 /*
                 * Edit to set path where swagger ui assets should be stored
