@@ -13,37 +13,42 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Enable Apache rewrite
 RUN a2enmod rewrite
 
+# Set Laravel public as DocumentRoot
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -i "s|/var/www/html|${APACHE_DOCUMENT_ROOT}|g" \
     /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
 
-# Copy Composer
+# Copy composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy application code
+# Copy all app files
 COPY . .
 
-# Install dependencies WITHOUT running artisan scripts
+# Install dependencies without triggering artisan
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# Fix permissions early
-RUN chown -R www-data:www-data storage bootstrap/cache && \
-    chmod -R 775 storage bootstrap/cache
+# -----------------------------
+# 🔥 PUBLISH SWAGGER DURING BUILD
+# -----------------------------
+RUN php artisan vendor:publish --tag=l5-swagger-assets --force && \
+    php artisan l5-swagger:generate --force || true
+
+# -----------------------------
+# 🔥 FIX ALL PERMISSIONS LAST
+# -----------------------------
+RUN chown -R www-data:www-data storage bootstrap/cache public/vendor && \
+    chmod -R 775 storage bootstrap/cache public/vendor
 
 EXPOSE 80
 
-# ----------------------------------------------------
-# FINAL STARTUP COMMANDS (RUN AT RUNTIME)
-# ----------------------------------------------------
+# --------------------------------------
+# 🟢 RUNTIME COMMAND (LIGHTWEIGHT ONLY)
+# --------------------------------------
 CMD set -e; \
-    echo "🔧 Setting up Laravel..."; \
     php artisan key:generate --force || true; \
     php artisan config:clear || true; \
     php artisan cache:clear || true; \
-    php artisan vendor:publish --provider=\"L5Swagger\\L5SwaggerServiceProvider\" --force || true; \
-    php artisan l5-swagger:generate || true; \
     php artisan migrate --force || true; \
-    echo "🚀 Starting Apache"; \
     apache2-foreground
