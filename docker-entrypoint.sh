@@ -17,12 +17,23 @@ fi
 # Ensure swagger assets are published and docs are generated at container start so
 # the runtime path used by l5-swagger exists and files are readable.
 if [ -f "/var/www/html/artisan" ]; then
+  # Remove any cached config so we don't keep stale/empty values (idempotent)
+  rm -f /var/www/html/bootstrap/cache/config.php || true
+
   # Publish swagger assets into public/vendor (idempotent)
   php /var/www/html/artisan vendor:publish --provider="L5Swagger\\L5SwaggerServiceProvider" --tag=assets --force || true
+
   # Generate swagger json/docs (non-fatal)
   php /var/www/html/artisan l5-swagger:generate || true
-  # Clear and cache config to ensure runtime config picks up any env overrides
+
+  # Clear config cache so runtime picks up env/config changes
   php /var/www/html/artisan config:clear || true
+
+  # Make sure the published assets are readable by the webserver
+  if [ -d "/var/www/html/public/vendor/l5-swagger" ]; then
+    chown -R www-data:www-data /var/www/html/public/vendor/l5-swagger || true
+    chmod -R a+r /var/www/html/public/vendor/l5-swagger || true
+  fi
 fi
 
 exec "$@"

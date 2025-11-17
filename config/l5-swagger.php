@@ -24,7 +24,8 @@ return [
                 * Edit to set path where swagger ui assets should be stored
                 */
                 // Default to the published assets in public/vendor so the UI can load
-                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'public/vendor/l5-swagger/'),
+                // If the environment variable is empty, fall back to the published public/vendor path
+                'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH') ?: 'public/vendor/l5-swagger/',
 
                 /*
                  * File name of the generated json documentation file
