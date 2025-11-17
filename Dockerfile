@@ -38,12 +38,16 @@ EXPOSE 80
 # FINAL STARTUP COMMANDS (RUN AT RUNTIME)
 # ----------------------------------------------------
 CMD set -e; \
-    echo "🔧 Setting up Laravel..."; \
+    echo "🔧 Running Laravel setup..."; \
+    mkdir -p storage/logs && touch storage/logs/laravel.log; \
+    chown -R www-data:www-data storage bootstrap/cache public/vendor || true; \
+    chmod -R 775 storage bootstrap/cache public/vendor || true; \
     php artisan key:generate --force || true; \
     php artisan config:clear || true; \
     php artisan cache:clear || true; \
-    php artisan vendor:publish --provider=\"L5Swagger\\L5SwaggerServiceProvider\" --force || true; \
+    php artisan vendor:publish --provider="L5Swagger\\L5SwaggerServiceProvider" --force || true; \
     php artisan l5-swagger:generate || true; \
     php artisan migrate --force || true; \
     echo "🚀 Starting Apache"; \
     apache2-foreground
+
