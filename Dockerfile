@@ -30,13 +30,15 @@ RUN cp .env.example .env || true
 # Install Composer dependencies (no artisan scripts during build)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
+# Ensure Laravel discovers package service providers (required before publishing vendor assets)
+RUN php artisan package:discover --ansi || true
+
 # -----------------------------------------------------
 # 🔥 IMPORTANT: Publish Swagger UI assets
 # -----------------------------------------------------
-RUN php artisan vendor:publish --tag=l5-swagger-assets --force
-
-# Ensure vendor folder exists
 RUN mkdir -p public/vendor
+# Publish L5 Swagger assets (requires package discovery)
+RUN php artisan vendor:publish --tag=l5-swagger-assets --force || true
 # -----------------------------------------------------
 # 🔥 IMPORTANT: Generate Swagger documentation
 # -----------------------------------------------------
