@@ -40,8 +40,15 @@ fi
 DB_FILE="/var/www/html/database/database.sqlite"
 mkdir -p "$(dirname "$DB_FILE")"
 touch "$DB_FILE" || true
-chown www-data:www-data "$DB_FILE" || true
-chmod 660 "$DB_FILE" || true
+# Ensure the database directory and file are owned by the web user and writable.
+chown -R www-data:www-data "/var/www/html/database" || true
+chmod -R 770 "/var/www/html/database" || true
+find "/var/www/html/database" -type f -exec chmod 660 {} \; || true
+
+# Fallback: if the sqlite file is still not writable (some hosts / mounts), relax permissions
+if [ ! -w "$DB_FILE" ]; then
+  chmod 666 "$DB_FILE" || true
+fi
 
 # Ensure storage and cache are writable
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
