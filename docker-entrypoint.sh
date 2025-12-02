@@ -36,14 +36,18 @@ if [ -f "/var/www/html/artisan" ]; then
   fi
 fi
 
-# Ensure sqlite database file exists and is writable by the web server
-DB_FILE="/var/www/html/database/database.sqlite"
-mkdir -p "$(dirname "$DB_FILE")"
+# Respect DB_DATABASE env if provided (useful for persistent disk mounts)
+DB_FILE="${DB_DATABASE:-/var/www/html/database/database.sqlite}"
+
+# Ensure the directory for the DB file exists
+DB_DIR="$(dirname "$DB_FILE")"
+mkdir -p "$DB_DIR"
 touch "$DB_FILE" || true
-# Ensure the database directory and file are owned by the web user and writable.
-chown -R www-data:www-data "/var/www/html/database" || true
-chmod -R 770 "/var/www/html/database" || true
-find "/var/www/html/database" -type f -exec chmod 660 {} \; || true
+
+# Ensure the database directory and files are owned by the web user and writable.
+chown -R www-data:www-data "$DB_DIR" || true
+chmod -R 770 "$DB_DIR" || true
+find "$DB_DIR" -type f -exec chmod 660 {} \; || true
 
 # Fallback: if the sqlite file is still not writable (some hosts / mounts), relax permissions
 if [ ! -w "$DB_FILE" ]; then
