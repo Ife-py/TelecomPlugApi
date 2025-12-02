@@ -29,7 +29,6 @@ class RegisteredUserController extends Controller
     *             @OA\Property(property="phoneNumber", type="string", example="+2348012345678"),
     *             @OA\Property(property="pin", type="string", format="password", example="1234"),
     *             @OA\Property(property="password", type="string", format="password", example="password123"),
-    *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
     *         )
     *     ),
     *     @OA\Response(
