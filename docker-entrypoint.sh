@@ -36,4 +36,15 @@ if [ -f "/var/www/html/artisan" ]; then
   fi
 fi
 
+# Ensure sqlite database file exists and is writable by the web server
+DB_FILE="/var/www/html/database/database.sqlite"
+mkdir -p "$(dirname "$DB_FILE")"
+touch "$DB_FILE" || true
+chown www-data:www-data "$DB_FILE" || true
+chmod 660 "$DB_FILE" || true
+
+# Ensure storage and cache are writable
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
+
 exec "$@"

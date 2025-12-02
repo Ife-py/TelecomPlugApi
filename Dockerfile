@@ -1,13 +1,15 @@
 # syntax=docker/dockerfile:1
 FROM php:8.2-apache
 
-# Install dependencies
+# Install dependencies (include sqlite dev libs and pdo_sqlite)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip zip curl ca-certificates libpng-dev libjpeg-dev libfreetype6-dev \
-    libzip-dev libpq-dev libonig-dev libxml2-dev libicu-dev \
+    libzip-dev libpq-dev libonig-dev libxml2-dev libicu-dev libsqlite3-dev sqlite3 \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd pdo_mysql pdo_pgsql pgsql intl zip bcmath mbstring \
+    && docker-php-ext-install -j$(nproc) gd pdo_mysql pdo_pgsql pgsql intl zip bcmath mbstring pdo_sqlite \
     && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p database && touch database/database.sqlite
 
 # Enable mod_rewrite for Laravel routing
 RUN a2enmod rewrite
