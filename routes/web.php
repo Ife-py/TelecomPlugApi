@@ -18,6 +18,16 @@ Route::get('/', function () {
     return redirect('/api/documentation');
 });
 
+Route::get('/test-db', function () {
+    try {
+        \DB::connection()->getPdo();
+        return 'Connected to: ' . \DB::connection()->getDatabaseName();
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+});
+
+
 // Debug route for l5-swagger assets - only enabled when APP_DEBUG=true
 Route::get('/_debug/l5-swagger', function () {
     if (!config('app.debug')) {
