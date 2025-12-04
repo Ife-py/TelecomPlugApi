@@ -68,13 +68,16 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
     
         // If the request wants a JSON response, it's likely an API call.
-        if ($request->wantsJson()) {
-            $token = $user->createToken('api-token')->plainTextToken;
-            return response()->json(['token' => $token], 201);
-        }
+        // if ($request->wantsJson()) {
+        //     $token = $user->createToken('api-token')->plainTextToken;
+        //     return response()->json(['token' => $token], 201);
+        // }
     
         Auth::login($user); // For web-based requests
     
-        return response()->noContent(); // For web-based requests
+        return response()->json([
+            'message' => 'User registered successfully',
+            'user' => $user,
+        ], 201);
     }
 }
