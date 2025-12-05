@@ -53,7 +53,7 @@ class LoginController extends Controller
               true,              // secure (must be true in production https)
               true,              // httpOnly
               false,             // raw
-              'Strict'           // same-site 
+              'Lax'           // same-site 
         );
     }
 
