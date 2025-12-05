@@ -18,13 +18,12 @@ Route::get('/', function () {
     return redirect('/api/documentation');
 });
 
-Route::get('/test-db', function () {
-    try {
-        \DB::connection()->getPdo();
-        return 'Connected to: ' . \DB::connection()->getDatabaseName();
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
+Route::get('/debug-auth', function (Request $request) {
+    return [
+        'user' => $request->user(),
+        'headers' => request()->header(),
+        'token' => request()->bearerToken(),
+    ];
 });
 
 

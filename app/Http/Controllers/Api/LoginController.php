@@ -44,7 +44,17 @@ class LoginController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $token,
-        ]);
+        ])->cookie(
+             'auth_token',      // cookie name
+              $token,            // value
+              120,       // expiration in minutes
+              '/',               // path
+              null,              // domain
+              true,              // secure (must be true in production https)
+              true,              // httpOnly
+              false,             // raw
+              'Strict'           // same-site 
+        );
     }
 
     /**
