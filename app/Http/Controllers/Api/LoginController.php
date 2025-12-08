@@ -35,27 +35,19 @@ class LoginController extends Controller
      */
     public function store(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
-        $request->authenticate();
+        $credentials = $request->only('email', 'password');
 
-        $user = $request->user();
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        $request->session()->regenerate();
 
         return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ])->cookie(
-             'auth_token',      // cookie name
-              $token,            // value
-              120,       // expiration in minutes
-              '/',               // path
-              null,              // domain
-              true,              // secure (must be true in production https)
-              true,              // httpOnly
-              false,             // raw
-              'Lax'           // same-site 
-        );
+            'user' => Auth::user()
+        ]);
     }
+
 
     /**
      * @OA\Post(
@@ -70,11 +62,13 @@ class LoginController extends Controller
      *     @OA\Response(response=401, description="Unauthenticated")
      * )
      */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request): \Illuminate\Http\JsonResponse
     {
-        // Revoke the token that was used to authenticate the current request...
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();                     // log the user out
+        $request->session()->invalidate();   // invalidate session
+        $request->session()->regenerateToken(); // regenerate CSRF token
 
-        return response()->noContent();
+        return response()->json(['message' => 'Logged out successfully']);
     }
+
 }
