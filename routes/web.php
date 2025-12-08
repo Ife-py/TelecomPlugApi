@@ -15,12 +15,12 @@ Route::get('/api-docs.json', function () {
     ]);
 });
 
-Route::controller(LoginController::class)->prefix('login')->name('login.')->group(function () {
-    Route::post('/', 'store');
+Route::controller(LoginController::class)->prefix('api/login')->name('login.')->group(function () {
+    Route::post('', 'store'); // no trailing slash
 });
 
-Route::controller(LoginController::class)->prefix('logout')->name('logout.')->group(function () {
-    Route::post('/', 'destroy');
+Route::controller(LoginController::class)->prefix('api/logout')->name('logout.')->group(function () {
+    Route::post('', 'destroy'); // no trailing slash
 });
 
 
