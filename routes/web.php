@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use App\Http\Controllers\Api\LoginController;
+use Illuminate\Http\Request;
 
 Route::get('/api-docs.json', function () {
     $path = storage_path('api-docs/api-docs.json');
@@ -12,6 +14,15 @@ Route::get('/api-docs.json', function () {
         'Content-Type' => 'application/json',
     ]);
 });
+
+Route::controller(LoginController::class)->prefix('login')->name('login.')->group(function () {
+    Route::post('/', 'store');
+});
+
+Route::controller(LoginController::class)->prefix('logout')->name('logout.')->group(function () {
+    Route::post('/', 'destroy');
+});
+
 
 
 Route::get('/', function () {

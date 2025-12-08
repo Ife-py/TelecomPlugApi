@@ -15,9 +15,9 @@ Route::controller(RegisteredUserController::class)->prefix('register')->name('re
     Route::post('/', 'store');
 });
 
-Route::controller(LoginController::class)->prefix('login')->name('login.')->group(function () {
-    Route::post('/', 'store');
-});
+// Route::controller(LoginController::class)->prefix('login')->name('login.')->group(function () {
+//     Route::post('/', 'store');
+// });
 
 Route::middleware(['auth:token-cookie'])->group(function () {
     Route::get('/user', function (Request $request) {
@@ -27,7 +27,7 @@ Route::middleware(['auth:token-cookie'])->group(function () {
         Route::get('/', 'show');
         Route::put('/', 'update');
     });
-    Route::post('/logout', [LoginController::class, 'destroy']);
+    // Route::post('/logout', [LoginController::class, 'destroy']);
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
