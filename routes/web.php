@@ -15,10 +15,10 @@ Route::get('/api-docs.json', function () {
     ]);
 });
 
-Route::prefix('api')->group(function () {
-    Route::post('login', [LoginController::class, 'store']);
-    Route::post('logout', [LoginController::class, 'destroy']);
-});
+// Route::prefix('api')->group(function () {
+//     Route::post('login', [LoginController::class, 'store']);
+//     Route::post('logout', [LoginController::class, 'destroy']);
+// });
 
 
 

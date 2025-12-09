@@ -34,19 +34,33 @@ class LoginController extends Controller
      * )
      */
     public function store(LoginRequest $request): \Illuminate\Http\JsonResponse
-    {
-        $credentials = $request->only('email', 'password');
+        {
+            // Validate and authenticate
+            $request->authenticate();
+            $user = $request->user();
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            // Create token
+            $token = $user->createToken('api-token')->plainTextToken;
+
+            // Return JSON with cookie
+            return response()
+                ->json([
+                    'message' => 'Login successful',
+                    'user' => $user,
+                    'token' => $token, // optional if you're using cookie only
+                ],200)
+                ->cookie(
+                    'auth_token',     // name
+                    $token,           // value
+                    60 * 24,          // expiration (minutes) = 1 day
+                    '/',              // path
+                    null,             // domain (null = backend domain)
+                    true,             // secure (MUST be true on HTTPS)
+                    true,             // httpOnly (true = safer)
+                    false,            // raw
+                    'Lax'             // SameSite: Lax | Strict | None
+                );
         }
-
-        $request->session()->regenerate();
-
-        return response()->json([
-            'user' => Auth::user()
-        ]);
-    }
 
 
     /**
@@ -62,13 +76,11 @@ class LoginController extends Controller
      *     @OA\Response(response=401, description="Unauthenticated")
      * )
      */
-    public function destroy(Request $request): \Illuminate\Http\JsonResponse
+    public function destroy(Request $request): Response 
     {
-        Auth::logout();                     // log the user out
-        $request->session()->invalidate();   // invalidate session
-        $request->session()->regenerateToken(); // regenerate CSRF token
-
-        return response()->json(['message' => 'Logged out successfully']);
+        // Revoke the token that was used to authenticate the current request... 
+        $request->user()->currentAccessToken()->delete();
+        return response()->noContent();
     }
 
 }
