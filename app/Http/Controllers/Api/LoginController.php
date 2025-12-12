@@ -39,26 +39,25 @@ class LoginController extends Controller
             $request->authenticate();
             $user = $request->user();
 
-            // Create token
+            // Create new API token
             $token = $user->createToken('api-token')->plainTextToken;
 
-            // Return JSON with cookie
+            // return response with HttpOnly cookie (secure)
             return response()
                 ->json([
                     'message' => 'Login successful',
                     'user' => $user,
-                    'token' => $token, // optional if you're using cookie only
-                ],200)
+                ], 200)
                 ->cookie(
-                    'auth_token',     // name
-                    $token,           // value
-                    60 * 24,          // expiration (minutes) = 1 day
-                    '/',              // path
-                    null,             // domain (null = backend domain)
-                    true,             // secure (MUST be true on HTTPS)
-                    true,             // httpOnly (true = safer)
-                    false,            // raw
-                    'Lax'             // SameSite: Lax | Strict | None
+                    'auth_token',
+                    $token,
+                    60,             // 1 day
+                    '/',
+                    config('session.domain') ?? null, // use domain from config
+                    true,                 // Secure cookies (HTTPS required)
+                    true,                 // HttpOnly (JavaScript cannot read cookie)
+                    false,
+                    'None'                // SameSite None → required for cross-domain SPA
                 );
         }
 
