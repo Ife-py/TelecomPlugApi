@@ -19,7 +19,7 @@ Route::controller(LoginController::class)->prefix('login')->name('login.')->grou
     Route::post('/', 'store');
 });
 
-Route::middleware(['auth:token-cookie'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
