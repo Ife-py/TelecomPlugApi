@@ -13,12 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
-        // Token-based API — no SPA, no CSRF
+        // ✅ Pure API middleware (NO SPA, NO CSRF)
         $middleware->api();
-
-        $middleware->validateCsrfTokens(except: [
-            'api/*',
-        ]);
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
