@@ -52,6 +52,11 @@ RUN php artisan l5-swagger:generate --force || true
 RUN chown -R www-data:www-data storage bootstrap/cache public/vendor \
     && chmod -R 775 storage bootstrap/cache public/vendor
 
+# Enable only rewrite for Laravel
+RUN a2enmod rewrite
+# Make sure no other MPMs are enabled
+RUN a2dismod mpm_prefork mpm_worker || true
+
 EXPOSE 80
 
 # ✅ Final startup sequence (runs when container starts, not during build)
